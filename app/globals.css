@@ -213,7 +213,8 @@ ul, ol { list-style: none; padding: 0; }
    instead, which is both faster and closer to the machined
    metal in the footage than frosted glass would be.
 
-   The sequence itself *is* defocused, by about 2px. That is
+   The sequence itself *is* defocused, by about 2px on a
+   phone and nearer 3 on a desktop. That is
    baked into the webp tiers by scripts/build-frames.mjs, not
    applied here, for the same reason: a blur in the asset is
    paid once at build time, a blur in CSS is paid on every

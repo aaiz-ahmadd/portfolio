@@ -76,13 +76,21 @@ const PHONE_CROP = {
    (canvas px per source px) / (device-pixel ceiling FrameSequence imposes):
    sm covers a portrait phone by height, 1055/800 at 1.25x, so a source pixel
    lands as 1.06 CSS px; md the same way at 1.5x gives 1.11; lg covers a
-   desktop by width, 2520/1920 at 1.5x, giving 0.88 — which is why lg needs the
-   largest sigma to arrive at the same 2px. These subsume the old half-pixel
-   grain softening entirely. */
+   desktop by width, 2520/1920 at 1.5x, giving 0.88 — so lg needs the largest
+   sigma before it even reaches parity. These subsume the old half-pixel grain
+   softening entirely.
+
+   lg is then pushed past parity on purpose, to about 2.8px rather than 2. The
+   arithmetic equalises pixels, not what the pixels are of: the phone tier is a
+   4:5 centre crop, so its subject is magnified and 2px covers proportionally
+   more of what is being looked at. Matched by the number, desktop read sharper
+   than the phone did — the full 16:9 frame spread across a wide viewport keeps
+   panel edges and surface detail that the crop does not. The extra sigma buys
+   back that difference, so the two read as the same depth of field. */
 const TIERS = [
   { tier: 'sm', crop: PHONE_CROP, width: 640, height: 800, quality: 60, blur: 1.9 },
   { tier: 'md', crop: null, width: 1280, height: 720, quality: 58, blur: 1.8 },
-  { tier: 'lg', crop: null, width: 1920, height: 1080, quality: 56, blur: 2.3 },
+  { tier: 'lg', crop: null, width: 1920, height: 1080, quality: 56, blur: 3.2 },
 ];
 
 const digest = (buf) => createHash('md5').update(buf).digest('hex');
