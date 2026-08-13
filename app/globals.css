@@ -1,0 +1,1408 @@
+/* ============================================================
+   Aaiz Ahmad — portfolio
+   ------------------------------------------------------------
+   The page sits on a hundred-frame render: a light burst that
+   settles into a sealed brass orb, opens, flies through the
+   machine inside it, and closes again. Everything below is
+   answerable to that footage.
+
+   Two rules run the whole design, and both come from measuring
+   the frames rather than from taste:
+
+   1. THE CENTRE IS NOT OURS. Every frame is composed radially
+      around a dead-centre subject — the orb, then the lens. So
+      the layout reserves a channel down the middle and puts all
+      copy in the outer thirds. That is the .plane grid.
+
+   2. THE SIDES GET HOT IN THE MIDDLE. Sampling the 90th-
+      percentile luminance of the left and right thirds across
+      the run: ~83-91 under the hero, dropping to ~58 at the
+      sealed orb, then climbing to 104-150 (with 248 peaks off
+      the bare heatsinks) for the whole interior stretch, before
+      falling back. So copy floats free on the footage at the two
+      open ends, and sits on real plates through the middle.
+      The page is quiet, then dense, then quiet — which is also
+      what the footage does.
+
+   Palette is sampled straight out of the frames. Nothing here is
+   invented: the greens are the measured field, the brass is the
+   measured hardware, the core is the measured blown highlight.
+   ============================================================ */
+
+:root {
+  /* Four families are also written as bare channel triplets, because they get
+     used at a dozen alphas across the sheet (scrims, hairlines, glows) and
+     rgba() cannot take a hex. Every rgba() below composes one of these, so
+     re-pointing these four is what moves the whole page between modes.
+     See the [data-theme='deep'] block. */
+  --ink-rgb: 5, 16, 9;
+  --jade-rgb: 24, 57, 37;
+  --brass-rgb: 201, 162, 78;
+  --line-rgb: 150, 176, 160;
+
+  /* --- the field (measured: #0c2617 / #153926 / #183925 / #1c4a31) --- */
+  --ink: #051009;
+  --jade-0: #081c12;
+  --jade-1: #0c2617;
+  --jade-2: #153926;
+  --jade-3: #1c4a31;
+  --jade-4: #27604a;
+
+  /* --- hardware (measured: brass mids ~#8d8861-#9b8556, metal ~#919189) --- */
+  /* Split by job, not by state. --brass is for anything that is not small text
+     — rules, dots, the solid button, focus rings, display-sized numerals.
+     --brass-lit is the one small text may use: at 12-14px over the interior
+     footage the mid brass lands around 3.9:1, and the lit tone takes the same
+     hue to 6.3:1 without leaving the palette. */
+  --brass-deep: #8a6f34;
+  --brass: #c9a24e;
+  --brass-lit: #e8c882;
+  --steel: #919189;
+
+  /* --- light --- */
+  --core: #faeed0;
+
+  /* --- type on all of it --- */
+  /* Checked against the worst ground each one actually sits on, not against a
+     convenient mid-tone: plates resolve to roughly 40/255, floating copy to
+     roughly 55/255 once the veil is on it.
+       --paper    12.2:1 on plate,  9.8:1 floating — body and headings
+       --paper-2   8.1:1 on plate,  6.5:1 floating — secondary copy
+       --paper-3   5.4:1 on plate,  5.1:1 floating — mono labels, metadata
+     --paper-3 was #8fa096 and measured 4.3:1 floating, just under AA at the
+     size the metadata is actually set. Lifted until it cleared. */
+  --paper: #e9efe9;
+  --paper-2: #c3cec6;
+  --paper-3: #9dada3;
+
+  /* --- type --- */
+  --f-display: var(--font-display), 'Helvetica Neue', sans-serif;
+  --f-body: var(--font-body), system-ui, sans-serif;
+  --f-mono: var(--font-mono), ui-monospace, monospace;
+
+  /* Fluid scale, locked between a 360px phone and a 1600px display. */
+  --t-mono: clamp(0.66rem, 0.61rem + 0.2vw, 0.76rem);
+  --t-small: clamp(0.86rem, 0.82rem + 0.2vw, 0.98rem);
+  --t-body: clamp(1rem, 0.95rem + 0.3vw, 1.12rem);
+  --t-lede: clamp(1.2rem, 1rem + 1vw, 1.75rem);
+  --t-h3: clamp(1.15rem, 1rem + 0.7vw, 1.55rem);
+  --t-h2: clamp(2.1rem, 1.5rem + 3vw, 4.4rem);
+  --t-hero: clamp(3.4rem, 1rem + 11.4vw, 10.5rem);
+
+  /* --- rhythm --- */
+  --gut: clamp(1.15rem, 3.4vw, 2.4rem);
+  --stack: clamp(5rem, 13vh, 10rem);
+  /* Wide enough on a desktop to clear the fixed index on the left and the
+     dimmer on the right — those two sit in the rails, so the rails have to be
+     the width of the widest thing in them (the index at its active size, about
+     74px) rather than whatever looked balanced. */
+  --rail: clamp(1.15rem, 5.5vw, 6.5rem);
+
+  /* The reserved centre. This is rule 1, as a number: the width the layout
+     refuses to put anything in, so the subject of every frame stays visible
+     the whole way down. It collapses to nothing below the breakpoint where
+     the layout stops being two-sided and starts stacking. */
+  --channel: clamp(0px, 22vw, 380px);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Glyph halo. Colour alone cannot beat the specular hits in this footage —
+     a bare heatsink edge passing behind a line of 12px mono peaks near 248,
+     and no flat text colour survives that. A tight dark edge on the glyphs
+     holds them without dimming the frames further. */
+  --halo: 0 1px 2px rgba(var(--ink-rgb), 0.6), 0 0 18px rgba(var(--ink-rgb), 0.45);
+
+  /* Film grain, over the footage so gradients do not band on wide-gamut
+     displays and the UI layer shares a texture with the render. */
+  --grain-src: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   Dimmed mode
+   ------------------------------------------------------------
+   Not an inverted palette — the same room at a lower exposure,
+   with the highlights protected. Surfaces drain toward black
+   while keeping their green cast, and the brass is left exactly
+   where it is, because the brass is the light source. Turn
+   everything else down and it becomes the only thing burning,
+   which is the entire point of the control.
+
+   Contrast rises here rather than falls: the field drops from
+   roughly 82/255 to roughly 46/255 under the dusk layer, so
+   every token gains about 2.5:1 over its default-mode worst
+   case. That is what pays for the small pull-back on the paper
+   family below — it reads calmer without spending any of the
+   legibility the default palette was measured for.
+   ============================================================ */
+:root[data-theme='deep'] {
+  --ink-rgb: 2, 8, 5;
+  --jade-rgb: 16, 40, 26;
+  --brass-rgb: 201, 162, 78; /* unchanged, and deliberately so */
+  /* Hairlines are the one family that has to come down rather than follow the
+     surfaces. They are drawn at fixed alphas, so against a darker field the
+     same value reads brighter — left alone they turn into visible wires. */
+  --line-rgb: 126, 150, 136;
+
+  --ink: #020805;
+  --jade-0: #05120b;
+  --jade-1: #081b10;
+  --jade-2: #0e2a1b;
+  --jade-3: #143723;
+  --jade-4: #1c4834;
+
+  --brass-deep: #7a6230;
+  --brass: #c9a24e;
+  --brass-lit: #e8c882;
+  --steel: #7e7e77;
+
+  --core: #faeed0;
+
+  --paper: #e2e9e3;
+  --paper-2: #b6c2b9;
+  --paper-3: #90a197;
+
+  --halo: 0 1px 2px rgba(var(--ink-rgb), 0.72), 0 0 18px rgba(var(--ink-rgb), 0.55);
+}
+
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Deliberately NOT scroll-behavior: smooth — see lib/scroll.js. That one
+     line was what made the sequence throw itself down the page on a phone. */
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+}
+
+img, canvas { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; padding: 0; }
+
+::selection { background: rgba(var(--brass-rgb), 0.3); color: var(--core); }
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   Backdrop: the scrubbed sequence, and the layers that make
+   type survivable on top of it
+   ------------------------------------------------------------
+   Four fixed layers, cheapest first. None of them blur anything:
+   the canvas repaints on every scroll tick, and a backdrop-filter
+   over a surface that changes 60 times a second makes the
+   compositor re-blur 60 times a second. That was the single
+   largest source of jank available to this page, so it is not
+   used anywhere on it — the plates further down are opaque
+   instead, which is both faster and closer to the machined
+   metal in the footage than frosted glass would be.
+   ============================================================ */
+.frame-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -4;
+  background: var(--ink);
+}
+
+/* Flat fill, ramped by GSAP against the measured luminance curve of the
+   footage — see page.jsx. Opacity only, so it stays a compositor-level
+   change and never triggers paint. */
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background: var(--ink);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Fixed vignette. Darkest at the two vertical edges, which is exactly where
+   the copy lives, and clear through the middle so the subject stays clean. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to right,
+      rgba(var(--ink-rgb), 0.72) 0%,
+      rgba(var(--ink-rgb), 0.3) 26%,
+      rgba(var(--ink-rgb), 0) 44%,
+      rgba(var(--ink-rgb), 0) 56%,
+      rgba(var(--ink-rgb), 0.3) 74%,
+      rgba(var(--ink-rgb), 0.72) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(var(--ink-rgb), 0.6) 0%,
+      rgba(var(--ink-rgb), 0) 22%,
+      rgba(var(--ink-rgb), 0) 74%,
+      rgba(var(--ink-rgb), 0.72) 100%
+    );
+}
+
+/* Sits before .grain at the same stacking index, so the grain still textures
+   the dimmed image rather than being dimmed by it. */
+.dusk {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--ink);
+  opacity: 0;
+  transition: opacity 0.7s var(--ease);
+}
+:root[data-theme='deep'] .dusk { opacity: 0.42; }
+
+/* Two things here were, together, the single worst performance bug on the page.
+   Measured on a production build, scrubbing the full document:
+
+     mix-blend-mode: overlay     24.7ms/frame   40fps
+     mix-blend-mode: soft-light  24.4ms         41fps
+     no blend, plain opacity     16.7ms         60fps
+     no grain at all             16.7ms         60fps
+
+   Blending a full-screen layer over a canvas that repaints every scroll tick
+   makes the compositor redo that blend every tick, and it costs about 8ms —
+   the whole difference between 40fps and a locked 60. Plain opacity is free:
+   identical, to the tenth of a millisecond, to not having the layer at all.
+   Any separable blend mode costs the same, so it is the blending itself and
+   not the choice of mode.
+
+   inset is 0 rather than the -50% this started as, for the same reason at a
+   different scale: -50% makes the element 200% x 200% of the viewport, so it
+   was blending four times the necessary area. The bleed bought nothing — the
+   layer never moves and the texture tiles, so there is no edge to hide.
+
+   The trade is that grain now sits on the image instead of modulating it, so
+   it can only lift the blacks rather than deepen them. That is what the lower
+   opacity is for: at 0.075 the ink floor moves by about 9/255, which reads as
+   film base fog and is the reason the value is not the 0.16 it was under the
+   blend. The layer still does both jobs it was there for — it breaks up
+   gradient banding on wide-gamut displays and ties the UI to the render. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--grain-src);
+  opacity: 0.075;
+}
+
+/* Promote the fixed backdrop layers.
+   Without this they share a paint layer with the canvas region underneath, so
+   every scrubbed frame dirties the viewport and all three gradients are
+   re-rasterised — gradient rasterisation, sixty times a second, for pixels
+   that never change. Promoted, they rasterise once and the compositor only
+   re-blends them, which is the cheap GPU path. Measured at ~10ms a frame.
+   veil and dusk name opacity specifically because that is what actually
+   animates on them; scrim and grain are static and just need the layer. */
+.veil, .dusk { will-change: opacity; }
+.veil, .scrim, .dusk, .grain { transform: translateZ(0); }
+
+/* ============================================================
+   The plane — rule 1, written as a grid
+   ------------------------------------------------------------
+   Five tracks: rail, left column, the reserved centre channel,
+   right column, rail. Content claims a side; nothing claims the
+   channel. Below the stacking breakpoint the channel goes to
+   zero and both sides run full width.
+   ============================================================ */
+.shell { position: relative; z-index: 1; }
+
+.plane {
+  display: grid;
+  grid-template-columns:
+    [bleed-start] var(--rail)
+    [l-start] minmax(0, 1fr)
+    [l-end] var(--channel)
+    [r-start] minmax(0, 1fr)
+    [r-end] var(--rail)
+    [bleed-end];
+  column-gap: 0;
+}
+
+.side-l { grid-column: l-start / l-end; }
+.side-r { grid-column: r-start / r-end; }
+.span   { grid-column: l-start / r-end; }
+.bleed  { grid-column: bleed-start / bleed-end; }
+
+.section {
+  position: relative;
+  padding-block: var(--stack);
+}
+
+.section--tall {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+}
+
+/* ---------- section chrome: the drawing reference ---------- */
+/* Every section is numbered and ruled like a plate in a manual. The rule runs
+   the full measure and the label sits on it, which is the one piece of
+   ornament on the page that earns its place — it is how the layout answers
+   the exploded-view render behind it. */
+.figure {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin-bottom: clamp(1.6rem, 4vh, 2.8rem);
+}
+
+.figure::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(var(--brass-rgb), 0.5),
+    rgba(var(--line-rgb), 0.14) 55%,
+    rgba(var(--line-rgb), 0)
+  );
+  transform: translateY(-0.28em);
+}
+
+.figure-ref {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.16em;
+  color: var(--brass-lit);
+  text-shadow: var(--halo);
+  white-space: nowrap;
+}
+
+.figure-name {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+  text-shadow: var(--halo);
+  white-space: nowrap;
+}
+
+.s-title {
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: 600;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  color: var(--paper);
+  text-shadow: var(--halo);
+  text-wrap: balance;
+}
+
+.s-lede {
+  margin-top: 1.1rem;
+  max-width: 34ch;
+  color: var(--paper-2);
+  text-shadow: var(--halo);
+}
+
+/* ---------- the plate ---------- */
+/* An anodised panel, not frosted glass. Opaque enough that the footage under
+   it never reaches the copy (that is what makes the interior stretch legible
+   at all), with a brass edge on the side it is anchored to, the way a machined
+   part catches light on one face. No blur — see the backdrop note above. */
+.plate {
+  position: relative;
+  padding: clamp(1.15rem, 2.6vw, 1.9rem);
+  background:
+    linear-gradient(
+      160deg,
+      rgba(var(--jade-rgb), 0.5),
+      rgba(var(--ink-rgb), 0.9) 46%,
+      rgba(var(--ink-rgb), 0.94)
+    );
+  border: 1px solid rgba(var(--line-rgb), 0.13);
+  border-radius: 3px;
+  box-shadow:
+    0 1px 0 rgba(var(--line-rgb), 0.06) inset,
+    0 18px 40px -24px rgba(0, 0, 0, 0.9);
+}
+
+.plate::before {
+  content: '';
+  position: absolute;
+  inset-block: -1px;
+  left: -1px; /* default; overridden per side below */
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--brass-rgb), 0) 0%,
+    rgba(var(--brass-rgb), 0.62) 22%,
+    rgba(var(--brass-rgb), 0.62) 78%,
+    rgba(var(--brass-rgb), 0) 100%
+  );
+}
+
+/* The edge lights on whichever side the plate is anchored to, so the two
+   columns lean away from the channel instead of both leaning left. */
+.side-l .plate::before, .plate--l::before { left: -1px; }
+.side-r .plate::before, .plate--r::before { right: -1px; }
+
+.plate-idx {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.14em;
+  color: var(--brass-lit);
+}
+
+/* ---------- shared bits ---------- */
+.mono {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+}
+
+.rule {
+  height: 1px;
+  background: rgba(var(--line-rgb), 0.12);
+  border: 0;
+}
+
+/* ============================================================
+   Index rail — the drawing index, down the left edge
+   ============================================================ */
+.idx {
+  position: fixed;
+  left: max(0.9rem, env(safe-area-inset-left));
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.idx-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.34rem 0.3rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.12em;
+  color: var(--paper-3);
+  text-shadow: var(--halo);
+  transition: color 0.32s var(--ease);
+}
+
+.idx-tick {
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  transition: width 0.42s var(--ease), opacity 0.32s var(--ease), background-color 0.32s var(--ease);
+}
+
+.idx-label {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.32s var(--ease), transform 0.42s var(--ease);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.idx-item:hover, .idx-item:focus-visible { color: var(--paper); }
+.idx-item:hover .idx-tick { width: 24px; opacity: 0.9; }
+.idx-item:hover .idx-label, .idx-item:focus-visible .idx-label { opacity: 1; transform: none; }
+
+/* The active item is marked by the brass and a longer tick, not by revealing
+   its label. The rail sits inside the layout's left gutter, and a label wide
+   enough to read ("Education") is wider than that gutter — shown permanently
+   it would sit on top of the column beside it. On hover it still appears, and
+   that is fine because it is momentary and deliberate. */
+.idx-item[aria-current='true'] { color: var(--brass-lit); }
+.idx-item[aria-current='true'] .idx-tick {
+  width: 28px;
+  opacity: 1;
+  background: var(--brass);
+}
+
+/* ============================================================
+   Dimmer — the only control on the page
+   ------------------------------------------------------------
+   Built out of vocabulary the page already speaks: a mono label,
+   a hairline, and the brass. It is a dimmer rather than a light
+   switch, so the motion argues for that — the fill slides down a
+   track instead of a knob flipping between two ends.
+   ============================================================ */
+.dimmer {
+  position: fixed;
+  right: max(0.9rem, env(safe-area-inset-right));
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.dimmer-track {
+  position: relative;
+  width: 2px;
+  height: 56px;
+  background: rgba(var(--line-rgb), 0.2);
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.dimmer-fill {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--core), var(--brass));
+  transform-origin: top;
+  transform: scaleY(1);
+  transition: transform 0.55s var(--ease);
+}
+:root[data-theme='deep'] .dimmer-fill { transform: scaleY(0.26); }
+
+/* Both readings live in the same grid cell and cross-fade, so the control
+   keeps one height whichever word is showing — a label that resized as it
+   changed would nudge the track it is meant to describe. */
+.dimmer-label {
+  display: grid;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+  text-shadow: var(--halo);
+  transition: color 0.32s var(--ease);
+}
+
+.dimmer-label i {
+  grid-area: 1 / 1;
+  writing-mode: vertical-rl;
+  font-style: normal;
+  transition: opacity 0.35s var(--ease);
+}
+
+.dimmer-label i[data-cap='b'] { opacity: 0; }
+:root[data-theme='deep'] .dimmer-label i[data-cap='a'] { opacity: 0; }
+:root[data-theme='deep'] .dimmer-label i[data-cap='b'] { opacity: 1; }
+
+.dimmer:hover .dimmer-label { color: var(--paper); }
+
+/* ============================================================
+   00 — Hero
+   ------------------------------------------------------------
+   The burst is centred and diffuse, and its core is the hottest
+   thing in the run (centre p90 ~169-184). So the name goes low
+   and left, the metadata goes low and right, and the upper
+   middle is left entirely to the footage. The type frames the
+   light rather than sitting on it.
+   ============================================================ */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  align-content: end;
+  padding-block: clamp(6rem, 14vh, 9rem) clamp(2.4rem, 7vh, 4.5rem);
+}
+
+.hero-eyebrow {
+  grid-column: l-start / r-end;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: clamp(1.1rem, 3vh, 2rem);
+}
+
+.hero-eyebrow::after {
+  content: '';
+  flex: 1;
+  max-width: 140px;
+  height: 1px;
+  background: linear-gradient(to right, rgba(var(--brass-rgb), 0.55), rgba(var(--brass-rgb), 0));
+}
+
+.hero-name {
+  grid-column: l-start / r-start;
+  font-family: var(--f-display);
+  font-size: var(--t-hero);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  color: var(--paper);
+  text-shadow: var(--halo);
+}
+
+/* Each line gets its own clipping row so the opening move can slide the name
+   up from behind a hard edge rather than fading it in.
+   The padding is what makes that survivable at this leading. Archivo's content
+   area is a little over 1em tall, so a 0.86 line box cuts the caps off the top
+   and the descenders off the bottom — which is exactly what it did. The
+   padding gives the ink room, and the matching negative margin takes that room
+   back out of the flow, so the lines still stack as tightly as they read.
+   The clip edge moves down with the padding, so the incoming line has further
+   to travel before it is hidden: see the yPercent in page.jsx, which is set
+   against this number. */
+.hero-line {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.16em;
+  margin-block: -0.16em;
+}
+
+.hero-line > span { display: block; }
+.hero-line:last-child > span { color: var(--paper-2); }
+
+.hero-foot {
+  grid-column: l-start / r-end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(1.4rem, 4vw, 3rem);
+  margin-top: clamp(1.8rem, 5vh, 3.2rem);
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  gap: clamp(0.9rem, 2.2vh, 1.5rem) clamp(1.4rem, 4vw, 3.4rem);
+}
+
+.hero-meta div { display: flex; flex-direction: column; gap: 0.15rem; }
+
+.hero-meta dt {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+  text-shadow: var(--halo);
+}
+
+.hero-meta dd {
+  font-size: var(--t-small);
+  color: var(--paper);
+  text-shadow: var(--halo);
+}
+
+/* The cue names the interaction and the narrative at once: the orb behind it
+   really does open, and only scrolling opens it. */
+.hero-cue {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass-lit);
+  text-shadow: var(--halo);
+  white-space: nowrap;
+}
+
+.hero-cue-track {
+  position: relative;
+  width: 46px;
+  height: 1px;
+  background: rgba(var(--brass-rgb), 0.28);
+  overflow: hidden;
+}
+
+.hero-cue-track::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 40%;
+  background: var(--brass);
+  animation: cue 2.6s var(--ease) infinite;
+}
+
+@keyframes cue {
+  0%   { transform: translateX(-100%); }
+  60%  { transform: translateX(250%); }
+  100% { transform: translateX(250%); }
+}
+
+/* ============================================================
+   01 — Approach
+   ------------------------------------------------------------
+   The sealed orb, dead centre, on the darkest stretch of the run
+   (side p90 ~58-67). Copy floats free here — no plates, nothing
+   between the words and the footage. It is the quietest moment
+   on the page and the layout should let it be quiet.
+   ============================================================ */
+.approach { row-gap: clamp(2.4rem, 6vh, 4rem); }
+
+.approach-lede {
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--paper);
+  text-shadow: var(--halo);
+  text-wrap: balance;
+}
+
+.approach-body {
+  display: grid;
+  gap: 1.15rem;
+  margin-top: clamp(1.2rem, 3vh, 2rem);
+  max-width: 40ch;
+  color: var(--paper-2);
+  text-shadow: var(--halo);
+}
+
+.approach-aside {
+  align-self: end;
+  display: grid;
+  gap: 1.4rem;
+  justify-items: start;
+}
+
+/* ---------- portrait ---------- */
+/* Demoted from the old hero on purpose. Against footage this cinematic a photo
+   card in the hero competes with the shot and reads as a template; here, next
+   to the sealed orb at the calmest point in the run, it is the human beat
+   before the machine opens. Smaller, quieter, better placed. */
+.portrait {
+  position: relative;
+  width: min(230px, 46vw);
+}
+
+.portrait-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 3px;
+  border: 1px solid rgba(var(--line-rgb), 0.16);
+  background: var(--jade-0);
+  clip-path: inset(0% 0% 0% 0%);
+}
+
+.portrait-canvas { width: 100%; height: 100%; object-fit: cover; }
+
+/* Corner ticks, borrowed from the registration marks on a drawing. */
+.portrait-media::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--brass), var(--brass)) left top / 9px 1px no-repeat,
+    linear-gradient(var(--brass), var(--brass)) left top / 1px 9px no-repeat,
+    linear-gradient(var(--brass), var(--brass)) right bottom / 9px 1px no-repeat,
+    linear-gradient(var(--brass), var(--brass)) right bottom / 1px 9px no-repeat;
+  opacity: 0.55;
+}
+
+/* ============================================================
+   02 — Education
+   ------------------------------------------------------------
+   The orb opens here and the sides start to heat (p90 87 -> 148),
+   so this is the first section on plates. Laid out as a descent:
+   a spine with the plates hung off it, most recent first.
+   ============================================================ */
+.edu-list {
+  display: grid;
+  gap: clamp(0.9rem, 2vh, 1.4rem);
+  position: relative;
+}
+
+.edu-item { position: relative; padding-left: clamp(1.3rem, 3vw, 2.2rem); }
+
+/* The spine, and a node per entry. Drawn with pseudo-elements rather than a
+   border so the gradient can fade at both ends instead of stopping dead. */
+.edu-item::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: calc(-1 * clamp(0.9rem, 2vh, 1.4rem));
+  width: 1px;
+  background: rgba(var(--line-rgb), 0.16);
+}
+
+.edu-item:last-child::before { bottom: auto; height: 26px; }
+
+.edu-item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--brass);
+  background: var(--ink);
+}
+
+.edu-item[data-status='current']::after {
+  background: var(--brass);
+  box-shadow: 0 0 0 3px rgba(var(--brass-rgb), 0.16);
+}
+
+/* Grid rather than a wrapping flex row. As flex, a long school name pushed the
+   metric onto its own line and left it hanging under the name, while a short
+   one kept it on the right — so the same field appeared in two different
+   places down a single column. Here the name wraps inside its own track and
+   the metric stays pinned top-right, which is where a spec value belongs. */
+.edu-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.3rem 1rem;
+}
+
+.edu-school {
+  font-family: var(--f-display);
+  font-size: var(--t-h3);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+.edu-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--f-mono);
+  white-space: nowrap;
+}
+
+.edu-metric b { font-size: var(--t-h3); font-weight: 500; color: var(--brass-lit); }
+.edu-metric span { font-size: var(--t-mono); letter-spacing: 0.12em; color: var(--paper-3); }
+
+.edu-cred { margin-top: 0.3rem; font-size: var(--t-small); color: var(--paper-2); }
+
+.edu-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(var(--line-rgb), 0.1);
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.1em;
+  color: var(--paper-3);
+}
+
+.edu-note { color: var(--paper-2); font-style: italic; }
+
+/* ---------- certifications, hung on the right ---------- */
+.certs { display: grid; gap: 0.55rem; }
+
+.cert {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(var(--line-rgb), 0.1);
+  transition: border-color 0.3s var(--ease);
+}
+
+.cert:last-child { border-bottom: 0; }
+a.cert:hover { border-color: rgba(var(--brass-rgb), 0.45); }
+
+.cert-name { flex: 1; font-size: var(--t-small); color: var(--paper); }
+a.cert:hover .cert-name { color: var(--brass-lit); }
+
+.cert-issuer {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.12em;
+  color: var(--paper-3);
+}
+
+/* ============================================================
+   03 — Stack
+   ------------------------------------------------------------
+   The deep interior: hardware laid out in mid-air on both sides
+   of frame. The section answers it literally — a parts inventory,
+   two columns of plates with the channel open between them.
+   ============================================================ */
+.stack-grid {
+  display: grid;
+  gap: clamp(0.8rem, 1.8vh, 1.2rem);
+  align-content: start;
+}
+
+.stack-group { padding: clamp(1rem, 2.2vw, 1.5rem) clamp(1.1rem, 2.4vw, 1.7rem); }
+
+.stack-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin-bottom: 0.2rem;
+}
+
+.stack-name {
+  font-family: var(--f-display);
+  font-size: var(--t-h3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+.stack-note { font-size: var(--t-small); color: var(--paper-3); margin-bottom: 0.85rem; }
+
+.stack-items { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.stack-item {
+  padding: 0.28rem 0.62rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  color: var(--paper-2);
+  background: rgba(var(--jade-rgb), 0.5);
+  border: 1px solid rgba(var(--line-rgb), 0.13);
+  border-radius: 2px;
+  transition: color 0.28s var(--ease), border-color 0.28s var(--ease), background-color 0.28s var(--ease);
+}
+
+.stack-group:hover .stack-item {
+  color: var(--paper);
+  border-color: rgba(var(--brass-rgb), 0.26);
+}
+
+/* ============================================================
+   04 — Work
+   ------------------------------------------------------------
+   The deepest point of the run and then the reassembly. The
+   projects alternate sides so the channel stays open all the way
+   through — which is what makes the column read as callouts on
+   an exploded diagram rather than as a list of cards.
+   ============================================================ */
+.work-list { display: grid; row-gap: clamp(1.6rem, 5vh, 3.4rem); }
+
+.work-item { grid-column: l-start / l-end; }
+.work-item:nth-child(even) { grid-column: r-start / r-end; }
+
+.work-card { display: block; padding: clamp(1.2rem, 2.6vw, 2rem); }
+
+.work-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.work-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+}
+
+.work-flag {
+  padding: 0.14rem 0.45rem;
+  color: var(--brass-lit);
+  border: 1px solid rgba(var(--brass-rgb), 0.4);
+  border-radius: 2px;
+}
+
+.work-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--f-display);
+  font-size: var(--t-h3);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--paper);
+  transition: color 0.3s var(--ease);
+}
+
+.work-card:hover .work-name { color: var(--brass-lit); }
+
+.work-arrow {
+  display: inline-block;
+  font-family: var(--f-mono);
+  font-weight: 400;
+  color: var(--brass);
+  transition: transform 0.42s var(--ease-out);
+}
+
+.work-card:hover .work-arrow { transform: translate(4px, -4px); }
+
+.work-summary { margin-top: 0.7rem; font-size: var(--t-small); color: var(--paper-2); }
+.work-detail {
+  margin-top: 0.6rem;
+  font-size: var(--t-small);
+  color: var(--paper-3);
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(var(--line-rgb), 0.1);
+}
+
+.work-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.9rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  color: var(--paper-3);
+}
+
+.work-stack li { display: flex; align-items: center; gap: 0.75rem; }
+.work-stack li:not(:last-child)::after {
+  content: '';
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(var(--brass-rgb), 0.55);
+}
+
+/* ============================================================
+   05 — Contact
+   ------------------------------------------------------------
+   The device reassembles and lights again. Side luminance drops
+   to ~60 and then comes back to ~92, so this returns to floating
+   type — the page opens back out exactly as the footage does.
+   ============================================================ */
+.contact { min-height: 100svh; align-content: center; }
+
+.contact-lede {
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--paper);
+  text-shadow: var(--halo);
+  white-space: pre-line;
+  text-wrap: balance;
+}
+
+.contact-note {
+  margin-top: 1.3rem;
+  max-width: 38ch;
+  font-size: var(--t-small);
+  color: var(--paper-2);
+  text-shadow: var(--halo);
+}
+
+.contact-mail {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin-top: clamp(1.8rem, 5vh, 3rem);
+  font-family: var(--f-display);
+  font-size: var(--t-lede);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--core);
+  text-shadow: var(--halo);
+  border-bottom: 1px solid rgba(var(--brass-rgb), 0.4);
+  padding-bottom: 0.3rem;
+  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.contact-mail:hover { color: var(--brass-lit); border-color: var(--brass); }
+.contact-mail .work-arrow { font-size: var(--t-small); }
+
+.contact-links {
+  align-self: end;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.contact-link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.4rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(var(--line-rgb), 0.12);
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+  text-shadow: var(--halo);
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), padding-left 0.36s var(--ease);
+}
+
+.contact-link:hover {
+  color: var(--brass-lit);
+  border-color: rgba(var(--brass-rgb), 0.4);
+  padding-left: 0.5rem;
+}
+
+.contact-link b { font-weight: 400; color: var(--paper); }
+.contact-link:hover b { color: var(--brass-lit); }
+
+.colophon {
+  grid-column: l-start / r-end;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+  margin-top: clamp(3rem, 9vh, 6rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(var(--line-rgb), 0.12);
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+  text-shadow: var(--halo);
+}
+
+/* ============================================================
+   Section placement
+   ------------------------------------------------------------
+   Written out per section rather than left to auto-placement.
+   Grid's sparse packing does happen to produce these rows for
+   this DOM order, but it does it by a rule about how the
+   placement cursor moves that nobody should have to re-derive
+   when a block gets reordered. Explicit here, so a later edit
+   cannot quietly shuffle a column into the channel.
+   ============================================================ */
+.education, .stack, .work { row-gap: clamp(1.8rem, 5vh, 3.4rem); }
+
+.edu-header { grid-column: l-start / l-end; grid-row: 1; }
+.edu-body   { grid-column: l-start / l-end; grid-row: 2; }
+.edu-side   { grid-column: r-start / r-end; grid-row: 2; align-self: start; }
+.edu-side > .mono { display: block; margin-bottom: 0.8rem; text-shadow: var(--halo); }
+
+.stack-header { grid-column: l-start / l-end; grid-row: 1; }
+.stack-col-l  { grid-column: l-start / l-end; grid-row: 2; }
+.stack-col-r  { grid-column: r-start / r-end; grid-row: 2; }
+
+.work-header { grid-column: l-start / l-end; grid-row: 1; }
+/* Spans the whole section so its own .plane tracks — the same rail and channel
+   variables — line its items up with the header above it. */
+.work-list { grid-column: bleed-start / bleed-end; grid-row: 2; }
+
+.approach-facts { display: grid; gap: 1rem; }
+.approach-facts div { display: grid; gap: 0.2rem; }
+.approach-facts dt { text-shadow: var(--halo); }
+.approach-facts dd {
+  font-size: var(--t-small);
+  color: var(--paper-2);
+  text-shadow: var(--halo);
+}
+.approach-facts a {
+  color: var(--brass-lit);
+  border-bottom: 1px solid rgba(var(--brass-rgb), 0.32);
+  transition: border-color 0.3s var(--ease);
+}
+.approach-facts a:hover { border-color: var(--brass); }
+
+/* ============================================================
+   Loader
+   ============================================================ */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.3rem;
+  background: var(--ink);
+  transition: opacity 0.75s var(--ease), visibility 0.75s;
+}
+
+.loader[data-done='true'] { opacity: 0; visibility: hidden; }
+
+.loader-name {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  text-transform: uppercase;
+  color: var(--paper-3);
+}
+
+.loader-bar {
+  width: min(200px, 46vw);
+  height: 1px;
+  background: rgba(var(--line-rgb), 0.18);
+  overflow: hidden;
+}
+
+.loader-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--brass), var(--core));
+  transition: width 0.24s linear;
+}
+
+.loader-pct {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.24em;
+  color: var(--brass-lit);
+}
+
+/* ============================================================
+   Reveal primitive — GSAP writes the final state
+   ------------------------------------------------------------
+   Content enters from the outside edge it belongs to rather than
+   from below, so the page assembles outward from the channel the
+   same way the hardware in the footage does.
+   ============================================================ */
+/* No will-change here on purpose. There are around forty of these on the page
+   and they enter a few at a time, so declaring the hint in CSS would promote
+   every one of them to its own layer from first paint and hold that memory for
+   motion most of them are minutes away from. The hint is set on the batch that
+   is about to move and cleared when it lands — see show() in page.jsx. */
+.reveal { opacity: 0; }
+.reveal[data-from='l'] { transform: translate3d(-22px, 0, 0); }
+.reveal[data-from='r'] { transform: translate3d(22px, 0, 0); }
+.reveal:not([data-from]) { transform: translate3d(0, 22px, 0); }
+
+/* ============================================================
+   Responsive
+   ------------------------------------------------------------
+   Below 900px the two-sided layout stops making sense: the
+   channel would leave two columns too narrow to set text in. So
+   the channel closes, the sides stack, and — because there is no
+   longer a clear middle to protect — the plates take over for
+   the sections that were floating.
+   ============================================================ */
+@media (max-width: 900px) {
+  :root { --channel: 0px; }
+
+  .plane { grid-template-columns: [bleed-start] var(--rail) [l-start r-start] minmax(0, 1fr) [l-end r-end] var(--rail) [bleed-end]; }
+  .side-l, .side-r, .span { grid-column: l-start / l-end; }
+
+  /* Everything the placement block above pinned to a column and a row goes
+     back to a single stacked flow. grid-row has to be reset too — left at 2,
+     the certifications would sit level with the education list instead of
+     after it. */
+  .edu-header, .edu-body, .edu-side,
+  .stack-header, .stack-col-l, .stack-col-r,
+  .work-header {
+    grid-column: l-start / l-end;
+    grid-row: auto;
+  }
+
+  .work-list { grid-column: bleed-start / bleed-end; grid-row: auto; }
+
+  .approach { row-gap: 2.2rem; }
+  .approach-aside { justify-items: start; }
+  .work-item, .work-item:nth-child(even) { grid-column: l-start / l-end; }
+
+  .hero-name { grid-column: l-start / l-end; }
+  .hero-foot { flex-direction: column; align-items: flex-start; }
+
+  .contact-links { align-self: start; margin-top: 2.4rem; }
+
+  /* The rails carry a fixed column on each edge. On a phone that is most of
+     the width, so the index collapses to ticks and the dimmer loses its
+     vertical label. */
+  .idx-label { display: none; }
+  .dimmer-label { display: none; }
+
+  /* Rule 1 stops protecting anything here, and that changes the numbers the
+     whole palette was measured against.
+     On a wide screen the reserved channel keeps copy out of the middle, so the
+     figure the tokens were checked on is side luminance — 58 to 150 across the
+     run. Once the channel collapses and the column runs full width, copy sits
+     on the CENTRE instead, and the centre is the bright part: 169-190 under
+     the two bursts, which is what the channel existed to avoid.
+     Two things land on that. The hero name, bottom-aligned at roughly 55-75%
+     of the viewport, meets the blown core of the opening burst at close to
+     1:1. And the contact block, vertically centred over the re-ignition, put
+     the small mono labels at about 4.1:1 — under AA.
+     So the scrim changes job on small screens. The side vignette goes, since
+     it was shading margins that no longer exist, and is replaced by a ramp
+     that protects the whole lower two-thirds where the copy actually is.
+     Against a 190-255 field it brings that band to roughly 81-85/255, which
+     puts the mono labels near 4.8:1 and the display type past 8:1. The top
+     third is left clear, so the footage still reads as footage. */
+  .scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--ink-rgb), 0.55) 0%,
+      rgba(var(--ink-rgb), 0.12) 28%,
+      rgba(var(--ink-rgb), 0.4) 50%,
+      rgba(var(--ink-rgb), 0.88) 100%
+    );
+  }
+}
+
+@media (max-width: 620px) {
+  .idx {
+    top: auto;
+    bottom: max(0.7rem, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    gap: 0.3rem;
+    padding: 0.4rem 0.7rem;
+    background: rgba(var(--ink-rgb), 0.72);
+    border: 1px solid rgba(var(--line-rgb), 0.12);
+    border-radius: 999px;
+  }
+
+  .idx-item { padding: 0.2rem 0.24rem; }
+  .idx-tick { display: none; }
+
+  .idx-item[aria-current='true'] { color: var(--brass-lit); }
+
+  .dimmer { top: auto; bottom: max(0.7rem, env(safe-area-inset-bottom)); transform: none; }
+  .dimmer-track { height: 34px; }
+
+  .hero-meta { grid-template-columns: minmax(0, 1fr); }
+  .contact-lede { white-space: normal; }
+}
+
+/* ============================================================
+   Reduced motion
+   ------------------------------------------------------------
+   Everything that moves here is decoration over content that is
+   already there, so all of it can simply stop. The sequence
+   holds a single frame (see FrameSequence) and the reveals rest
+   in their final state.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .hero-cue-track::after { animation: none; transform: none; width: 100%; opacity: 0.5; }
+}
+
+@media print {
+  .frame-canvas, .veil, .scrim, .dusk, .grain, .idx, .dimmer, .loader, .portrait { display: none; }
+  body { background: #fff; color: #111; }
+  .plate { border: 1px solid #ccc; background: none; box-shadow: none; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}

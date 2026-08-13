@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Local tooling, not part of the project
+.claude/
+.vercel/
+
+# Repository backups, kept locally rather than committed
+*.bundle
