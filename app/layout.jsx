@@ -1,4 +1,4 @@
-import { Archivo, Schibsted_Grotesk, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { profile } from '@/lib/content';
 import { FRAME_TIERS, framePath } from '@/lib/frames';
 import { PORTRAIT_TIERS, portraitPath } from '@/lib/portrait';
@@ -22,25 +22,36 @@ import './globals.css';
 
    JetBrains Mono carries every label, index and part number. It is the font he
    actually writes code in, which makes it honest rather than decorative, and
-   it is what lets the metadata read as a drawing annotation. */
+   it is what lets the metadata read as a drawing annotation.
 
-const display = Archivo({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
+   All three are self-hosted from app/fonts/ rather than pulled with
+   next/font/google. The Google loader downloads the files at *build* time, so
+   a builder that cannot reach fonts.gstatic.com fails the whole build rather
+   than falling back — which is exactly what happened on the first deploy. The
+   files are the latin subset of each variable font, so a single file per family
+   covers every weight the page sets, and they are served from this origin
+   instead of a third party. */
+
+const display = localFont({
+  src: './fonts/Archivo-Variable.woff2',
+  weight: '100 900',
+  style: 'normal',
   variable: '--font-display',
   display: 'swap',
 });
 
-const body = Schibsted_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+const body = localFont({
+  src: './fonts/SchibstedGrotesk-Variable.woff2',
+  weight: '400 900',
+  style: 'normal',
   variable: '--font-body',
   display: 'swap',
 });
 
-const mono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+const mono = localFont({
+  src: './fonts/JetBrainsMono-Variable.woff2',
+  weight: '100 800',
+  style: 'normal',
   variable: '--font-mono',
   display: 'swap',
 });
@@ -111,7 +122,6 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Frame 1 is the hero backdrop — fetch it with the document. One link
             per tier, each scoped to the same media query the loader picks with,
             so exactly the tier that gets painted is the tier that gets

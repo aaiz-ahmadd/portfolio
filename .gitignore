@@ -12,3 +12,4 @@ out/
 
 # Repository backups, kept locally rather than committed
 *.bundle
+.vercel
