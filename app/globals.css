@@ -212,6 +212,13 @@ ul, ol { list-style: none; padding: 0; }
    used anywhere on it — the plates further down are opaque
    instead, which is both faster and closer to the machined
    metal in the footage than frosted glass would be.
+
+   The sequence itself *is* defocused, by about 3px. That is
+   baked into the webp tiers by scripts/build-frames.mjs, not
+   applied here, for the same reason: a blur in the asset is
+   paid once at build time, a blur in CSS is paid on every
+   repaint. See the TIERS note there for why the sigma differs
+   per tier.
    ============================================================ */
 .frame-canvas {
   position: fixed;
@@ -1356,6 +1363,12 @@ a.cert:hover .cert-name { color: var(--brass-lit); }
 }
 
 @media (max-width: 620px) {
+  /* On a phone the rail crosses the middle of the screen instead of sitting in
+     a margin, so copy scrolls underneath it — unavoidable for a fixed control,
+     and the reason the fill is no longer 0.72. At that opacity a heading
+     passing behind the pill stayed legible through it and the two read as one
+     smeared object; opaque, the pill occludes cleanly and reads as a control
+     in front of the page rather than a tint over it. */
   .idx {
     top: auto;
     bottom: max(0.7rem, env(safe-area-inset-bottom));
@@ -1364,9 +1377,16 @@ a.cert:hover .cert-name { color: var(--brass-lit); }
     flex-direction: row;
     gap: 0.3rem;
     padding: 0.4rem 0.7rem;
-    background: rgba(var(--ink-rgb), 0.72);
-    border: 1px solid rgba(var(--line-rgb), 0.12);
+    background: rgb(var(--ink-rgb));
+    border: 1px solid rgba(var(--line-rgb), 0.18);
     border-radius: 999px;
+  }
+
+  /* Occluding cleanly still leaves the last screen of the page under the pill,
+     where scrolling cannot move it out. Reserve its height plus the gap it
+     floats in, so the end of the contact section always clears it. */
+  .contact {
+    padding-bottom: calc(3.25rem + max(0.7rem, env(safe-area-inset-bottom)));
   }
 
   .idx-item { padding: 0.2rem 0.24rem; }

@@ -64,10 +64,25 @@ const PHONE_CROP = {
    ceiling FrameSequence imposes (1.25x on phones, 1.5x elsewhere) — not by
    round numbers. Past that ceiling every extra source pixel is thrown away by
    drawImage, so it is pure download and decode cost. */
+/* The sequence is defocused to about 3px on screen, so the footage reads as a
+   backdrop and the type in front of it stops competing with the hardware.
+   Baked here rather than as `filter: blur(3px)` on the canvas, for the reason
+   the note at the top of the backdrop section in globals.css gives: the canvas
+   repaints on every scroll tick, and a filter would make the compositor redo
+   the blur on every one of them. This costs nothing at runtime.
+
+   The number differs per tier because each is drawn at a different scale, and
+   a blur baked at source resolution scales with the image. Per tier that is
+   (canvas px per source px) / (device-pixel ceiling FrameSequence imposes):
+   sm covers a portrait phone by height, 1055/800 at 1.25x, so a source pixel
+   lands as 1.06 CSS px; md the same way at 1.5x gives 1.11; lg covers a
+   desktop by width, 2520/1920 at 1.5x, giving 0.88 — which is why lg needs the
+   largest sigma to arrive at the same 3px. These subsume the old half-pixel
+   grain softening entirely. */
 const TIERS = [
-  { tier: 'sm', crop: PHONE_CROP, width: 640, height: 800, quality: 60, blur: 0.5 },
-  { tier: 'md', crop: null, width: 1280, height: 720, quality: 58, blur: 0.4 },
-  { tier: 'lg', crop: null, width: 1920, height: 1080, quality: 56, blur: 0 },
+  { tier: 'sm', crop: PHONE_CROP, width: 640, height: 800, quality: 60, blur: 2.8 },
+  { tier: 'md', crop: null, width: 1280, height: 720, quality: 58, blur: 2.7 },
+  { tier: 'lg', crop: null, width: 1920, height: 1080, quality: 56, blur: 3.4 },
 ];
 
 const digest = (buf) => createHash('md5').update(buf).digest('hex');
