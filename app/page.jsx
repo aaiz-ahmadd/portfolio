@@ -202,7 +202,15 @@ export default function Page() {
          would sit at opacity 0 forever. After any scroll settles, reveal
          whatever is already on screen but still hidden. */
       const catchUp = () => {
-        const cutoff = window.innerHeight * 0.9;
+        /* The 0.9 keeps the net from firing on things the reader has not
+           reached yet. At the end of the document that reasoning inverts:
+           nothing can scroll any higher, so anything still on screen is as
+           reached as it will ever be, and holding it to the same cutoff leaves
+           whatever rests in the last tenth — the colophon, on a short viewport
+           — at opacity 0 permanently. */
+        const doc = document.documentElement;
+        const atEnd = window.scrollY >= doc.scrollHeight - window.innerHeight - 2;
+        const cutoff = atEnd ? window.innerHeight : window.innerHeight * 0.9;
         const missed = gsap.utils
           .toArray('.section:not(.hero) .reveal')
           .filter((el) => !handled.has(el) && el.getBoundingClientRect().top < cutoff);

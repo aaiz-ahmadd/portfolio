@@ -1099,7 +1099,20 @@ a.cert:hover .cert-name { color: var(--brass-lit); }
    to ~60 and then comes back to ~92, so this returns to floating
    type — the page opens back out exactly as the footage does.
    ============================================================ */
-.contact { min-height: 100svh; align-content: center; }
+/* The trailing padding is cut back from the --stack every other section gets.
+   Everywhere else that space has the sequence behind it and reads as air; here
+   the document simply stops, and the scrim's bottom ramp — 0.72 ink at 100%,
+   which is doing real work holding copy legible further up — has nothing left
+   to darken except empty page. A hundred pixels of that at the very end read as
+   a black bar under the colophon rather than as margin. Trimmed, the footer
+   sits near the bottom edge the way a footer should, and the ramp lands on the
+   footage instead of on nothing. The scrim itself is untouched: it is load
+   bearing for contrast on every other screen. */
+.contact {
+  min-height: 100svh;
+  align-content: center;
+  padding-bottom: clamp(1.75rem, 3.5vh, 2.75rem);
+}
 
 .contact-lede {
   font-family: var(--f-display);
