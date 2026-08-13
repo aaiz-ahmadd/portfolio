@@ -35,23 +35,23 @@ export default function Approach() {
       </div>
 
       <div className="side-r approach-aside">
-        <div className="reveal" data-from="r">
+        <div className="reveal" data-from="r" data-cursor="Aaiz :)">
           <Portrait />
         </div>
 
         <dl className="approach-facts reveal" data-from="r">
-          <div>
+          <div data-cursor="ITU">
             <dt className="mono">Currently</dt>
             <dd>Second semester, BS Computer Science at ITU</dd>
           </div>
           <div>
             <dt className="mono">Elsewhere</dt>
             <dd>
-              <a href={profile.github} target="_blank" rel="noreferrer noopener">
+              <a href={profile.github} data-cursor="GitHub" target="_blank" rel="noreferrer noopener">
                 GitHub
               </a>
               {' · '}
-              <a href={profile.linkedin} target="_blank" rel="noreferrer noopener">
+              <a href={profile.linkedin} data-cursor="LinkedIn" target="_blank" rel="noreferrer noopener">
                 LinkedIn
               </a>
             </dd>

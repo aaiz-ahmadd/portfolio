@@ -37,6 +37,7 @@ export default function Stack() {
             <article
               className={`stack-group plate ${ci === 0 ? 'plate--l' : 'plate--r'} reveal`}
               data-from={ci === 0 ? 'l' : 'r'}
+              data-cursor={group.group}
               key={group.group}
             >
               <div className="stack-head">
@@ -50,7 +51,7 @@ export default function Stack() {
 
               <ul className="stack-items">
                 {group.items.map((item) => (
-                  <li className="stack-item" key={item}>
+                  <li className="stack-item" data-cursor={item} key={item}>
                     {item}
                   </li>
                 ))}

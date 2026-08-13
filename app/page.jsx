@@ -16,6 +16,7 @@ import Education from '@/components/Education';
 import Stack from '@/components/Stack';
 import Work from '@/components/Work';
 import Contact from '@/components/Contact';
+import Cursor from '@/components/Cursor';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -279,6 +280,7 @@ export default function Page() {
 
       <IndexRail />
       <Dimmer />
+      <Cursor />
 
       <main className="shell" ref={root}>
         <Hero />

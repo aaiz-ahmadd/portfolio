@@ -30,7 +30,7 @@ export default function Contact() {
           {contact.note}
         </p>
 
-        <a className="contact-mail reveal" data-from="l" href={`mailto:${profile.email}`}>
+        <a className="contact-mail reveal" data-from="l" data-cursor="Email" href={`mailto:${profile.email}`}>
           {profile.email}
           <span className="work-arrow" aria-hidden="true">
             ↗
@@ -43,6 +43,7 @@ export default function Contact() {
           <a
             className="contact-link reveal"
             data-from="r"
+            data-cursor={l.label === 'Phone' ? 'Call' : l.label}
             href={l.href}
             key={l.label}
             {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noreferrer noopener' } : {})}

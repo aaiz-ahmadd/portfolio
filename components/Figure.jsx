@@ -8,7 +8,7 @@
  */
 export default function Figure({ mark, name, from = 'l' }) {
   return (
-    <div className="figure reveal" data-from={from}>
+    <div className="figure reveal" data-from={from} data-cursor={mark}>
       <span className="figure-ref">{mark}</span>
       <span className="figure-name">{name}</span>
     </div>

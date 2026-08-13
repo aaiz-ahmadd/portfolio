@@ -36,6 +36,7 @@ export default function Work() {
             <li className="work-item reveal" data-from={side} key={p.name}>
               <a
                 className={`work-card plate plate--${side}`}
+                data-cursor={p.name}
                 href={p.href}
                 target="_blank"
                 rel="noreferrer noopener"
@@ -61,7 +62,7 @@ export default function Work() {
 
                 <ul className="work-stack">
                   {p.stack.map((s) => (
-                    <li key={s}>{s}</li>
+                    <li key={s} data-cursor={s}>{s}</li>
                   ))}
                 </ul>
               </a>

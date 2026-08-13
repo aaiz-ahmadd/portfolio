@@ -68,6 +68,7 @@ export default function IndexRail() {
           key={s.id}
           href={`#${s.id}`}
           className="idx-item"
+          data-cursor={s.label}
           aria-current={active === s.id ? 'true' : undefined}
           onPointerDown={onPointerDown}
           onClick={(e) => go(e, s.id)}

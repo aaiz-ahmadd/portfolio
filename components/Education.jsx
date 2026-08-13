@@ -33,9 +33,9 @@ export default function Education() {
       <ol className="edu-list edu-body">
         {education.map((e) => (
           <li className="edu-item reveal" data-from="l" data-status={e.status} key={e.school}>
-            <article className="plate plate--l">
+            <article className="plate plate--l" data-cursor={e.abbr || e.school}>
               <div className="edu-head">
-                <h3 className="edu-school">{e.school}</h3>
+                <h3 className="edu-school" data-cursor={e.abbr || e.school}>{e.school}</h3>
                 <p className="edu-metric">
                   <b>{e.metric}</b>
                   <span>{e.metricLabel}</span>
@@ -65,6 +65,7 @@ export default function Education() {
             c.href ? (
               <a
                 className="cert"
+                data-cursor={c.issuer || 'Coursera'}
                 href={c.href}
                 target="_blank"
                 rel="noreferrer noopener"
@@ -74,7 +75,7 @@ export default function Education() {
                 <span className="cert-issuer">{c.issuer}</span>
               </a>
             ) : (
-              <div className="cert" key={c.name}>
+              <div className="cert" data-cursor={c.issuer || 'Coursera'} key={c.name}>
                 <span className="cert-name">{c.name}</span>
                 <span className="cert-issuer">{c.issuer}</span>
               </div>

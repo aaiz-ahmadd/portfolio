@@ -14,7 +14,7 @@ export default function Hero() {
     <section id="hero" className="section hero plane" aria-label="Introduction">
       <p className="hero-eyebrow mono">{heroEyebrow}</p>
 
-      <h1 className="hero-name">
+      <h1 className="hero-name" data-cursor="Aaiz Ahmad">
         {heroLines.map((line) => (
           /* The clipping row is the parent; the child is what slides. Two
              elements per line so the opening move can come up from behind a
@@ -27,17 +27,27 @@ export default function Hero() {
 
       <div className="hero-foot">
         <dl className="hero-meta">
-          {heroMeta.map(({ label, value }) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
+          {heroMeta.map(({ label, value }) => {
+            const cursorVal =
+              label === 'Studying'
+                ? 'ITU'
+                : label === 'Working in'
+                  ? 'MERN'
+                  : label === 'Recently'
+                    ? 'FAST'
+                    : 'Open';
+            return (
+              <div key={label} data-cursor={cursorVal}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            );
+          })}
         </dl>
 
         {/* Names the interaction and the narrative at once — the orb behind
             this really does open, and only scrolling opens it. */}
-        <p className="hero-cue">
+        <p className="hero-cue" data-cursor="Scroll">
           Scroll to open
           <span className="hero-cue-track" aria-hidden="true" />
         </p>

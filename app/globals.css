@@ -1432,11 +1432,113 @@ a.cert:hover .cert-name { color: var(--brass-lit); }
 
   .reveal { opacity: 1 !important; transform: none !important; }
   .hero-cue-track::after { animation: none; transform: none; width: 100%; opacity: 0.5; }
+
+  /* The bubble is pure decoration that tracks the pointer; nothing under it
+     depends on it, so it goes rather than stops. */
+  .cursor-bubble-container { display: none !important; }
+}
+
+/* ============================================================
+   Hover Bubble Custom Cursor
+   ------------------------------------------------------------
+   Hardware-accelerated interactive cursor bubble that follows
+   the mouse and dynamically expands when hovering over
+   interactive elements and key terms.
+   ============================================================ */
+
+.cursor-bubble-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+.cursor-bubble-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--core);
+  box-shadow: 0 0 10px rgba(201, 162, 78, 0.8), 0 0 20px rgba(201, 162, 78, 0.4);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cursor-bubble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%) scale(0);
+  transform-origin: center center;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* A fixed, equal width and height is what keeps this a circle. The previous
+     min-width/min-height let the box grow with its label, and a grown box under
+     border-radius: 9999px is a capsule — the radius was never the problem, the
+     free width was. Sized to hold the longest label ("Spotify MERN Clone")
+     across three lines without touching the curve. */
+  width: 104px;
+  height: 104px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(8, 28, 18, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 162, 78, 0.5);
+  box-shadow:
+    0 8px 32px rgba(5, 16, 9, 0.7),
+    inset 0 0 16px rgba(201, 162, 78, 0.18),
+    0 0 24px rgba(201, 162, 78, 0.25);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cursor-bubble-text {
+  font-family: var(--f-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--core);
+  text-align: center;
+  /* nowrap is what pushed a long label through the edge. Wrapping instead, with
+     the line box capped near the circle's inscribed square (104 / √2 ≈ 73px) —
+     the width that stays clear of the curve on every line, not just the middle
+     line where the circle is widest. 72% (≈75px) sits a hair over that square
+     because the longest labels wrap to two lines, which straddle the middle
+     where there is room to spare; the three-line worst case still clears by
+     ~13px. The width is what decides wrapping, so it is set against the widest
+     single word in the content — "JavaScript" and "Frameworks" at 10 characters.
+     Any narrower and those break mid-word into "JAVASCRIP / T". break-word is
+     the backstop for a label longer than anything currently in lib/content.js. */
+  white-space: normal;
+  max-width: 72%;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+  text-shadow: 0 0 10px rgba(201, 162, 78, 0.5);
+  pointer-events: none;
+}
+
+/* Hide on touch/coarse devices and reduced motion */
+@media (hover: none), (pointer: coarse) {
+  .cursor-bubble-container {
+    display: none !important;
+  }
 }
 
 @media print {
-  .frame-canvas, .veil, .scrim, .dusk, .grain, .idx, .dimmer, .loader, .portrait { display: none; }
+  .frame-canvas, .veil, .scrim, .dusk, .grain, .idx, .dimmer, .loader, .portrait, .cursor-bubble-container { display: none; }
   body { background: #fff; color: #111; }
   .plate { border: 1px solid #ccc; background: none; box-shadow: none; }
   .reveal { opacity: 1 !important; transform: none !important; }
 }
+

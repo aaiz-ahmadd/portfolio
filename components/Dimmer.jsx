@@ -76,6 +76,7 @@ export default function Dimmer() {
       className="dimmer"
       role="switch"
       aria-checked={deep}
+      data-cursor="Dim / Light"
       /* Named on the element rather than by its visible text, for two reasons:
          the label is display:none below 900px, which would take it out of the
          accessibility tree along with the button's only name — and the visible
